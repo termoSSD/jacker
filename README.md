@@ -25,7 +25,8 @@
 Since this project relies on local AI generation, you must have the following installed before running it:
 1. **Python 3.x**
 2. [**Ollama**](https://ollama.ai/) installed and running.
-3. The `qwen2.5-coder` model downloaded. To do this, open your terminal and run:
+3. The `qwen2.5-coder` model ar another downloaded. To do this, open your terminal and run:
+
    ```bash
    ollama pull qwen2.5-coder
 
