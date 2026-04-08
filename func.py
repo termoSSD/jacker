@@ -14,7 +14,7 @@ def handle_command(cmd):
         if current_path: #  if no path
             return f"{current_path}"
         else: # if path empty
-            return "Path empty USE: -p <шлях>" 
+            return "Path empty USE: -p <path>" 
         
     # clear console
     if cmd.startswith(("--clear", "-c")):
@@ -23,8 +23,8 @@ def handle_command(cmd):
 
     # AI chat
     if cmd.startswith('ai "'):
-        prompt = cmd[4:-1]
-        return ask_ai(prompt)
+        clean_prompt = cmd[3:].strip().strip('"\'') + " (write plain text, no markdown, no asterisks)"
+        return ask_ai(clean_prompt)
 
     # AI file 
     if cmd.startswith("ai file "):

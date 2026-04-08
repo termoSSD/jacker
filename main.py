@@ -24,8 +24,9 @@ while True:
    
     result = handle_command(cmd)
     
-    if result is not None:
-        print("\n== ", end="") 
-        print_smoothly(str(result), delay=0.01)
-        print()
+    if result is not None and str(result).strip():
+        if not cmd.startswith("ai"):
+            print("\n== ", end="") 
+            print_smoothly(str(result), delay=0.01)
+            print()
 
