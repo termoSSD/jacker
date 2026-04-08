@@ -164,7 +164,7 @@ def restart_program():
     cmd = f'start python "{sys.argv[0]}"'
     subprocess.Popen(cmd, shell=True)
     
-    os._exit(0) [cite: 1]
+    os._exit(0)
  
 # exit the program
 def exit():

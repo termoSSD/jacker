@@ -32,7 +32,7 @@ def handle_command(cmd):
         code = read_file(file_name)
 
         if not code:
-            return "❌ File not found"
+            return "File not found"
 
         return ask_ai(f"Explain this code:\n{code}")
 
