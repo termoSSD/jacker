@@ -84,6 +84,7 @@ BASE COMMANDS:
   -p, --project <path>   Set the project workspace directory
   -r, restart            Full restarting of program
   -e, exit               Exit
+          
 AI   COMMANDS:
   ai "<prompt>"          Ask a general question
   ai file <name>         Analyze a specific file
