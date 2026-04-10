@@ -1,8 +1,7 @@
 import os
-import requests
 import time
-from core import *
-from func import *
+from core.cmd import clear, show_menu, print_smoothly, get_or_set_model
+from func import handle_command
 
 if os.name == 'nt':
     os.system('cls && mode con: cols=120 lines=30')
@@ -17,11 +16,14 @@ for i in range(101):
 
 print("\n     - Ready!\n")
 
+get_or_set_model()
 show_menu()
 
 while True:
     cmd = input(">> ").strip()
-   
+    if not cmd:
+        continue
+
     result = handle_command(cmd)
     
     if result is not None and str(result).strip():
