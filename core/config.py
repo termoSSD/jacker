@@ -4,13 +4,14 @@ import json
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SETTINGS_FILE = os.path.join(BASE_DIR, "settings.json")
-OLLAMA_URL = "http://localhost:11434/api/generate"
 MEMORY_DIR = os.path.join(BASE_DIR, "memory")
 
 DEFAULT_SETTINGS = {
     "model": "",
     "project_path": "",
-    "record_history": False
+    "record_history": False,
+    "ctx_size": 4096,
+    "clear_before_menu": True
 }
 
 def load_settings():
