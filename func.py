@@ -1,7 +1,7 @@
 import os
 import re
-from core.ai import ask_ai, change_model, current_model, set_memory_recording, get_memory_status
-from core.cmd import set_project, get_project, clear, show_help_menu, read_file, restart_program, exit_program
+from core.ai import ask_ai, change_ctx_size, change_model, current_ctx_size, current_model, load_session, save_session, set_memory_recording, get_memory_status
+from core.cmd import set_auto_clear, set_project, get_project, clear, show_ai_help_menu, show_base_help_menu, show_full_help_menu, show_cosmetic_menu, read_file, restart_program, exit_program, show_settings
 
 ALLOWED_EXTENSIONS = {
     '.py', '.js', '.ts', '.html', '.css', '.cpp', 
@@ -10,26 +10,53 @@ ALLOWED_EXTENSIONS = {
 
 def handle_command(cmd):
 
+    parts = cmd.lower().split()
+    if not parts:
+        return None
+   
+    # Cosmetic commands    
+    if parts[0] in ("--help", "-h"):
+        if len(parts) > 1:
+            sub = parts[1]
+            if sub == "ai":
+                show_ai_help_menu()
+                return None
+            if sub == "base":
+                show_base_help_menu()
+                return None
+            if sub == "csmt":
+                show_cosmetic_menu()
+                return None
+        
+        show_full_help_menu()
+        return None
+    if cmd.strip() in ("--clear", "-c"):
+        clear()
+        return None
+    if cmd.strip() == "--autoclear off":
+        return set_auto_clear(False)
+    if cmd.strip() == "--autoclear on":
+        return set_auto_clear(True)
+    if cmd.strip() in ("--settings", "-s"):
+        show_settings()
+        return None
+   
+    # Path commands
     if cmd.startswith(("--path ", "-p ")):
         path = cmd.split(" ", 1)[1].strip()
         path = path.strip('"\'')
         return set_project(path)
-
     if cmd.startswith(("--path", "-p")):
         current_path = get_project()
         if current_path: 
             return f"{current_path}"
         else: 
             return "Path empty USE: -p <path>" 
-        
-    if cmd.startswith(("--clear", "-c")):
-        clear()
-        return None
 
+    # AI commands
     if cmd.startswith('ai "'):
         clean_prompt = cmd[3:].strip().strip('"\'') + " (write plain text, no markdown, no asterisks)"
         return ask_ai(clean_prompt)
-
     if cmd.startswith("ai file "):
         match = re.match(r'ai file\s+([^\s"]+)\s+"([^"]+)"', cmd)
         
@@ -46,14 +73,12 @@ def handle_command(cmd):
 
         full_query = f"{user_prompt}:\n{code}\n\n(Important: Plain text only, no asterisks)"
         return ask_ai(full_query)
-    
     if cmd == "ai project":
         if not get_project():
             return "Set project first"
 
         result = ""
 
-        # ВИПРАВЛЕНО: _, замінено на dirs
         for root, dirs, files in os.walk(get_project()):
             dirs[:] = [d for d in dirs if not d.startswith('.') and d != '__pycache__']
            
@@ -74,17 +99,15 @@ def handle_command(cmd):
 
         return result
 
-    if cmd.strip() in ("--help", "-h"):
-        show_help_menu()
-    
+    # Model commands
     if cmd.startswith(("--model ", "-m ")):
         new_model = cmd.split(" ", 1)[1].strip()
         return change_model(new_model)
-        
     if cmd.strip() in ("--model", "-m"):
         current = current_model()
         return f"{current}"
-        
+    
+    # Memory recording commands
     if cmd.strip() == "--memory off":
         return set_memory_recording(False)
     if cmd.strip() == "--memory on":
@@ -92,9 +115,29 @@ def handle_command(cmd):
     if cmd.strip() == "--memory s":
         return f"Memory recording is {get_memory_status()}"
 
+    # Session commands
+    if cmd.startswith("ai save "):
+        session_name = cmd[len("ai save "):].strip()
+        if not session_name:
+            return "Provide a session name (e.g., ai save project1)"
+        return save_session(session_name)
+    if cmd.startswith("ai load "):
+        session_name = cmd[len("ai load "):].strip()
+        if not session_name:
+            return "Provide a session name (e.g., ai load project1)"
+        return load_session(session_name)
+    
+    # Context size commands
+    if cmd.startswith(("--context ", "-ctx ")):
+        new_size = cmd.split(" ", 1)[1].strip()
+        return change_ctx_size(new_size)
+    if cmd.strip() in ("--context", "-ctx"):
+        current = current_ctx_size()
+        return f"Current context size: {current}"
+
+    # Restart and exit commands
     if cmd.strip() in ("restart", "-r"):
         restart_program()
-
     if cmd.strip() in ("exit", "-e"):
         exit_program()
         

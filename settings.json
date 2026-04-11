@@ -1,5 +1,7 @@
 {
-    "model": "qwen2.5",
+    "model": "C:\\source\\models\\qwen2.5-coder.gguf",
     "project_path": "C:\\source\\AI_assistant",
-    "record_history": false
+    "record_history": true,
+    "ctx_size": 1024,
+    "clear_before_menu": true
 }
