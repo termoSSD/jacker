@@ -6,7 +6,7 @@
 | **Version** | 0.9.5 |
 | **Type** | Command Line Interface (CLI) |
 | **Status** | Beta |
-| **License** | MIT |
+| **License** | GPL-3.0 |
 
 ---
 
