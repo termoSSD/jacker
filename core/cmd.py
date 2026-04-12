@@ -197,12 +197,17 @@ def check_for_updates(manual_check=False):
         if not remote_version:
             return "Error: Empty version received." if manual_check else None
 
+        no_cache_url = f"{GITHUB_VERSION_URL}?t={int(time.time())}"
+        
+        with urllib.request.urlopen(no_cache_url, timeout=5) as response:
+            remote_version = response.read().decode('utf-8').strip()
+
         def parse_version(v):
             return tuple(map(int, v.split('.')))
 
         # Check if remote version is strictly greater than the local version
         if parse_version(remote_version) > parse_version(VERSION):
-            print(f"\n[ UPDATE AVAILABLE ] v{VERSION} -> v{remote_version}")
+            print(f"\n[UPDATE AVAILABLE] v{VERSION} -> v{remote_version}")
             
             # Ask the user for confirmation
             ans = input("Do you want to download and apply the update now? [y/n]: ").strip().lower()
