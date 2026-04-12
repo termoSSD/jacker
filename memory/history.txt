@@ -53,3 +53,11 @@ AI Response:
 Hello! How can I assist you today?
 ============================================================
 
+[2026-04-12 16:29:51]
+Prompt:
+hi (write plain text, no markdown, no asterisks)
+
+AI Response:
+Hello! How can I assist you today?
+============================================================
+

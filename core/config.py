@@ -6,15 +6,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SETTINGS_FILE = os.path.join(BASE_DIR, "settings.json")
 MEMORY_DIR = os.path.join(BASE_DIR, "memory")
 
-# Наприклад, якщо твій нік на GitHub - termoSSD:
-GITHUB_VERSION_URL = "https://github.com/termoSSD/below/VERSION"
+VERSION = "0.9.5"
+GITHUB_VERSION_URL = "https://raw.githubusercontent.com/termoSSD/below/main/VERSION"
 
 DEFAULT_SETTINGS = {
     "model": "",
     "project_path": "",
     "record_history": False,
     "ctx_size": 4096,
-    "clear_before_menu": True
+    "clear_before_menu": True,
+    "auto_update_check": True
 }
 
 def load_settings():

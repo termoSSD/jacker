@@ -1,7 +1,7 @@
 import os
 import re
 from core.ai import ask_ai, change_ctx_size, change_model, current_ctx_size, current_model, load_session, save_session, set_memory_recording, get_memory_status
-from core.cmd import get_app_version, set_auto_clear, set_project, get_project, clear, show_ai_help_menu, show_base_help_menu, show_full_help_menu, show_cosmetic_menu, read_file, restart_program, exit_program, show_settings
+from core.cmd import get_app_version, set_auto_clear, set_auto_update, set_project, get_project, clear, show_ai_help_menu, show_base_help_menu, show_full_help_menu, show_cosmetic_menu, read_file, restart_program, exit_program, show_settings, check_for_updates
 
 ALLOWED_EXTENSIONS = {
     '.py', '.js', '.ts', '.html', '.css', '.cpp', 
@@ -15,7 +15,7 @@ def handle_command(cmd):
         return None
    
     # Cosmetic commands    
-    if parts[0] in ("--help", "-h"):    
+    if parts[0] in ("--help", "-h"):
         if len(parts) > 1:
             sub = parts[1]
             if sub == "ai":
@@ -41,9 +41,23 @@ def handle_command(cmd):
         show_settings()
         return None
    
-    if cmd.strip() in ("--version", "-v"):
+    # Version commands
+    if parts[0] in ("--version", "-v"):
+        if len(parts) > 1 and parts[1] == "up":
+            # Trigger manual update check
+            check_for_updates(manual_check=True)
+            return None # Return None since the function prints the output itself
+            
+        # If just -v is passed, show current version
         return get_app_version()
-
+    if parts[0] == "--autoupdate":
+        if len(parts) > 1:
+            if parts[1] == "off":
+                return set_auto_update(False)
+            if parts[1] == "on":
+                return set_auto_update(True)
+        return "Usage: --autoupdate [on|off]"
+    
     # Path commands
     if cmd.startswith(("--path ", "-p ")):
         path = cmd.split(" ", 1)[1].strip()

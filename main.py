@@ -1,6 +1,8 @@
 import os
 import time
-from core.cmd import clear, show_menu, print_smoothly, get_or_set_model
+from core.config import get_setting
+from core.ai import get_or_set_model
+from core.cmd import clear, show_menu, print_smoothly, check_for_updates
 from func import handle_command
 
 if os.name == 'nt':
@@ -18,6 +20,9 @@ print("\n     - Ready!\n")
 
 get_or_set_model()
 show_menu()
+
+if get_setting("auto_update_check"):
+    check_for_updates()
 
 while True:
     cmd = input(">> ").strip()

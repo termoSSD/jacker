@@ -3,5 +3,6 @@
     "project_path": "C:\\source\\AI_assistant",
     "record_history": true,
     "ctx_size": 1024,
-    "clear_before_menu": true
+    "clear_before_menu": false,
+    "auto_update_check": true
 }

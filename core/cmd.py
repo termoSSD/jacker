@@ -2,29 +2,16 @@ import os
 import time
 import sys
 import subprocess
+import urllib.request
 from turtle import clear
+from core.logger import get_logger
 from core.ai import current_model, change_model
-from core.config import VERSION, update_setting, get_setting
+from core.config import VERSION, GITHUB_VERSION_URL, update_setting, get_setting
 
-
-def get_or_set_model():
-    model = current_model()
-    if model:
-        return model
-    
-    # If no model is set, ask the user to input one
-    model = ""
-    while not model:
-        model = input("Enter model: ").strip()
-        if not model:
-            print("ERROR: Model name cannot be empty.")
-            
-    # Save the model to the config file and update the global variable
-    change_model(model)
-    return model
+logger = get_logger(__name__)
 
 '''
-HELP MENUS
+HELPS MENUS
 '''
 
 def show_menu():
@@ -36,7 +23,7 @@ def show_menu():
                |  _ <|  __|  | |/ _ \ \ /\ / /              
                | |_) | |____ | | (_) \ V  V /               
                |____/|______ |_|\___/ \_/\_/                                                
-                         v {VERSION}                            
+                         v{VERSION}                            
 
     """)
 
@@ -47,13 +34,15 @@ def show_cosmetic_menu():
 =======================================================================================
                           COSMETIC COMMANDS HELP MENU
 =======================================================================================
+
 COSMETIC COMMANDS:
     -h, --help [base|ai|csmt] Show this help message
     -s, --settings            Show all current program settings
-
     -c, --clear               Clear the terminal screen
-    --autoclear [on|off]      Toggle auto-clearing the screen before showing the menu
           
+    --autoclear [on|off]      Toggle auto-clearing the screen before showing the menu
+    --autoupdate [on|off]     Toggle automatic update check on startup     
+
 =======================================================================================
 """)
 
@@ -66,13 +55,14 @@ def show_base_help_menu():
 ====================================================================
 
 BASE COMMANDS:
-  -m, --model [path]        View current model or set a new one
-  -p, --project <path>      Set the project workspace directory
-  -ctx, --context <size>    Set the context size for the AI model (e.g., -ctx 2048)
-  --memory [on|off|s]       Enable, disable, or check history status
+    -v, --version [up]        Checking for updates
+    -m, --model [path]        View current model or set a new one
+    -p, --project <path>      Set the project workspace directory
+    -ctx, --context <size>    Set the context size for the AI model (e.g., -ctx 2048)
+    --memory [on|off|s]       Enable, disable, or check history status
           
-  -r, --restart             Restart the program
-  -e, --exit                Exit the program
+    -r, --restart             Restart the program
+    -e, --exit                Exit the program
           
 ====================================================================
     """)
@@ -133,9 +123,10 @@ AI COMMANDS:
 COSMETIC COMMANDS:
     -h, --help [base|ai|csmt] Show this help message
     -s, --settings            Show all current program settings      
-
     -c, --clear               Clear the terminal screen
+          
     --autoclear [on|off]      Toggle auto-clearing the screen 
+    --autoupdate [on|off]     Toggle automatic update check on startup
           
 ====================================================================
     """)
@@ -155,6 +146,7 @@ def show_settings():
         "Context Size": get_setting("ctx_size"),
         "Memory (History)": "ON" if get_setting("record_history") else "OFF",
         "Auto-clear Menu": "ON" if get_setting("clear_before_menu") else "OFF",
+        "Auto-update Check": "ON" if get_setting("auto_update_check") else "OFF", # <--- НОВИЙ РЯДОК
         "Project Path": get_setting("project_path") or "Not set"
     }
     
@@ -188,17 +180,80 @@ def set_auto_clear(state: bool):
     return f"Auto-clear before menu is now {status}"
 
 '''
-Project management
+APP MANAGER
 '''
-
 def get_app_version():
     return f"Current Version: {VERSION}v"
 
+def check_for_updates(manual_check=False):
+    """Checks for updates on GitHub. If available, prompts to download and apply."""
+    try:
+        if manual_check:
+            print("Checking for updates on GitHub...")
+            
+        with urllib.request.urlopen(GITHUB_VERSION_URL, timeout=5) as response:
+            remote_version = response.read().decode('utf-8').strip()
+            
+        if not remote_version:
+            return "Error: Empty version received." if manual_check else None
+
+        def parse_version(v):
+            return tuple(map(int, v.split('.')))
+
+        # Check if remote version is strictly greater than the local version
+        if parse_version(remote_version) > parse_version(VERSION):
+            print(f"\n[ UPDATE AVAILABLE ] v{VERSION} -> v{remote_version}")
+            
+            # Ask the user for confirmation
+            ans = input("Do you want to download and apply the update now? [y/n]: ").strip().lower()
+            
+            if ans in ('y', 'yes'):
+                print("Pulling updates from GitHub...")
+                try:
+                    # Execute 'git pull' command in the terminal
+                    subprocess.run(["git", "pull"], check=True)
+                    print("\nUpdate successful!")
+                    
+                    # Offer to restart the program immediately to apply changes
+                    ans_restart = input("Restart program to apply changes? [y/n]: ").strip().lower()
+                    if ans_restart in ('y', 'yes'):
+                        restart_program() 
+                        
+                except subprocess.CalledProcessError as e:
+                    print(f"\n[ERROR] Failed to pull updates. (You might have uncommitted local changes)")
+                    print("Try running 'git commit' first, or 'git pull' manually.")
+            else:
+                print("Update skipped. You can update later using '-v up'.")
+                
+            return None # Output is already printed, no need to return a string
+            
+        else:
+            # If no updates are available
+            if manual_check:
+                print(f"You are using the latest version (v{VERSION}).")
+            return None 
+
+    except urllib.error.URLError:
+        return "Error: No internet connection." if manual_check else None
+    except Exception as e:
+        logger.exception(f"Update error: {e}")
+        return f"Error checking updates: {e}" if manual_check else None
+
+def set_auto_update(state: bool):
+    update_setting("auto_update_check", state)
+    status = "ON" if state else "OFF"
+    return f"Auto-update check on startup is now {status}"
+
+'''
+PROJECT MANAGER
+'''
+
 def read_file(name):
-    if not project_path:
+    p_path = get_project()
+    if not p_path:
         return None
 
-    for root, _, files in os.walk(project_path):
+    for root, _, files in os.walk(p_path):
         for f in files:
             if f == name:
                 with open(os.path.join(root, f), "r", encoding="utf-8") as file:

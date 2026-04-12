@@ -14,10 +14,13 @@ _chat_history = [
     {"role": "system", "content": "You are a helpful AI development assistant. Answer concisely."}
 ]
 
+'''
+LLAMA MANAGER
+'''
+
 @llama_log_callback
 def suppress_llama_logs(level, message, user_data):
     pass
-
 llama_log_set(suppress_llama_logs, ctypes.c_void_p())
 
 def load_llm():
@@ -42,6 +45,28 @@ def load_llm():
         logger.exception(f"[CRITICAL ERROR] occurred while loading the model: {e}")
         return False
 
+'''
+MODEL MANAGER 
+     &
+COMMUNICATION WITH AI
+'''
+
+def get_or_set_model():
+    model = current_model()
+    if model:
+        return model
+    
+    # If no model is set, ask the user to input one
+    model = ""
+    while not model:
+        model = input("Enter model: ").strip()
+        if not model:
+            print("ERROR: Model name cannot be empty.")
+            
+    # Save the model to the config file and update the global variable
+    change_model(model)
+    return model
+
 def change_model(new_model):
     new_model = new_model.strip()
     update_setting("model", new_model)
@@ -53,30 +78,6 @@ def change_model(new_model):
 
 def current_model(): 
     return get_setting("model")
-
-def change_ctx_size(new_size):
-    try:
-        size_int = int(new_size.strip())
-        if size_int < 512:
-            return "ERROR: Size is too small (minimum 512)."
-        
-        update_setting("ctx_size", size_int)
-        logger.info(f"Context size changed to {size_int}")
-        
-        # If the model is already loaded, reload it with the new memory size
-        global _llm_instance
-        if _llm_instance is not None:
-            print(f"\nReloading model with new memory size ({size_int})...")
-            if load_llm():
-                return f"Successful: Context size updated to {size_int} and model reloaded."
-            else:
-                return "ERROR: Size changed, but failed to reload model."
-        return f"Successful: Context size updated to {size_int}."
-    except ValueError:
-        return "ERROR: Please enter a number (e.g., -ctx 2048)"
-
-def current_ctx_size():
-    return get_setting("ctx_size")
 
 def ask_ai(prompt):
     global _llm_instance, _chat_history
@@ -131,6 +132,39 @@ def ask_ai(prompt):
         
         return error_msg   
 
+
+'''
+RAM SIZE MANAGER
+'''
+
+def change_ctx_size(new_size):
+    try:
+        size_int = int(new_size.strip())
+        if size_int < 512:
+            return "ERROR: Size is too small (minimum 512)."
+        
+        update_setting("ctx_size", size_int)
+        logger.info(f"Context size changed to {size_int}")
+        
+        # If the model is already loaded, reload it with the new memory size
+        global _llm_instance
+        if _llm_instance is not None:
+            print(f"\nReloading model with new memory size ({size_int})...")
+            if load_llm():
+                return f"Successful: Context size updated to {size_int} and model reloaded."
+            else:
+                return "ERROR: Size changed, but failed to reload model."
+        return f"Successful: Context size updated to {size_int}."
+    except ValueError:
+        return "ERROR: Please enter a number (e.g., -ctx 2048)"
+
+def current_ctx_size():
+    return get_setting("ctx_size")
+
+'''
+HISTORY MANAGER
+'''
+
 def set_memory_recording(state: bool):
     update_setting("record_history", state)
     status = "ON" if state else "OFF"
@@ -138,6 +172,10 @@ def set_memory_recording(state: bool):
 
 def get_memory_status():
     return "ON" if get_setting("record_history") else "OFF"
+
+'''
+SESION MANAGER
+'''
 
 def save_to_memory(prompt, response):
     if not get_setting("record_history"):
