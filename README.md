@@ -1,9 +1,9 @@
-# 🚀 Jacker - AI Development Assistant
+# 🚀 Below - AI Development Assistant
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Python](https://img.shields.io/badge/Python-3.x-yellow.svg)](https://www.python.org/)
 
-> **Jacker** is a purely local, CLI-based AI development assistant. Powered by [Ollama](https://ollama.ai/) and the `qwen2.5-coder` model, it helps you analyze code, explain specific files, or review entire projects directly from your terminal—without sending a single line of your code to the cloud.
+> **Below** is a purely local, CLI-based AI development assistant. Powered by [Ollama](https://ollama.ai/) and the `qwen2.5-coder` model, it helps you analyze code, explain specific files, or review entire projects directly from your terminal—without sending a single line of your code to the cloud.
 
 ## 📑 Table of Contents
 - [Features](#-features)
@@ -35,8 +35,8 @@ Since this project relies on local AI generation, you must have the following in
     Clone the repository:
     Bash
 
-    git clone [https://github.com/termoSSD/Jacker.git](https://github.com/termoSSD/Jacker.git)
-    cd Jacker
+    git clone [https://github.com/termoSSD/Below.git](https://github.com/termoSSD/Below.git)
+    cd Below
 
     Install the required dependencies (requests library):
     Bash
