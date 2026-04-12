@@ -1,7 +1,7 @@
 import os
 import re
 from core.ai import ask_ai, change_ctx_size, change_model, current_ctx_size, current_model, load_session, save_session, set_memory_recording, get_memory_status
-from core.cmd import set_auto_clear, set_project, get_project, clear, show_ai_help_menu, show_base_help_menu, show_full_help_menu, show_cosmetic_menu, read_file, restart_program, exit_program, show_settings
+from core.cmd import get_app_version, set_auto_clear, set_project, get_project, clear, show_ai_help_menu, show_base_help_menu, show_full_help_menu, show_cosmetic_menu, read_file, restart_program, exit_program, show_settings
 
 ALLOWED_EXTENSIONS = {
     '.py', '.js', '.ts', '.html', '.css', '.cpp', 
@@ -15,7 +15,7 @@ def handle_command(cmd):
         return None
    
     # Cosmetic commands    
-    if parts[0] in ("--help", "-h"):
+    if parts[0] in ("--help", "-h"):    
         if len(parts) > 1:
             sub = parts[1]
             if sub == "ai":
@@ -41,6 +41,9 @@ def handle_command(cmd):
         show_settings()
         return None
    
+    if cmd.strip() in ("--version", "-v"):
+        return get_app_version()
+
     # Path commands
     if cmd.startswith(("--path ", "-p ")):
         path = cmd.split(" ", 1)[1].strip()
