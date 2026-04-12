@@ -4,7 +4,7 @@ import sys
 import subprocess
 from turtle import clear
 from core.ai import current_model, change_model
-from core.config import update_setting, get_setting
+from core.config import VERSION, update_setting, get_setting
 
 
 def get_or_set_model():
@@ -29,10 +29,15 @@ HELP MENUS
 
 def show_menu():
     clear()
-    print("""
-============================================================
-                AI DEVELOPMENT ASSISTANT
-============================================================
+    print(f"""
+                ____  ______  _                             
+               |  _ \|  ____ | |                            
+               | |_) | |__   | | _____      __              
+               |  _ <|  __|  | |/ _ \ \ /\ / /              
+               | |_) | |____ | | (_) \ V  V /               
+               |____/|______ |_|\___/ \_/\_/                                                
+                         v {VERSION}                            
+
     """)
 
 def show_cosmetic_menu():
@@ -99,7 +104,9 @@ def show_full_help_menu():
         clear()
     print("""
 ====================================================================
-                      AI DEVELOPMENT ASSISTANT
+                  ____  _____ __     _____  __    __
+                  ||=)  ||==  ||    ((   )) \\ /\ //
+                  ||_)) ||___ ||__|  \\_//   \V/\V/  
 ====================================================================
 Code analysis & AI helper for local projects.
 --------------------------------------------------------------------
@@ -110,7 +117,7 @@ USAGE:
 BASE COMMANDS:
     -m, --model [path]        View current model or set a new one
     -p, --project <path>      Set the project workspace directory
-    -ctx, --context <size>    Set the context size for the AI model (e.g., -ctx 2048)
+    -ctx, --context <size>    Set the context size for the AI model
     --memory [on|off|s]       Enable, disable, or check history status
   
     -r, --restart             Restart the program
@@ -139,7 +146,7 @@ def show_settings():
         clear()
 
     print("\n" + "="*40)
-    print("       CURRENT SYSTEM SETTINGS")
+    print(f"       SYSTEM SETTINGS (v{VERSION})")
     print("="*40)
     
     # Take all relevant settings and format them for display
@@ -183,6 +190,9 @@ def set_auto_clear(state: bool):
 '''
 Project management
 '''
+
+def get_app_version():
+    return f"Current Version: {VERSION}v"
 
 def read_file(name):
     if not project_path:

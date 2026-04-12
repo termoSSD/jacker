@@ -6,6 +6,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SETTINGS_FILE = os.path.join(BASE_DIR, "settings.json")
 MEMORY_DIR = os.path.join(BASE_DIR, "memory")
 
+# Наприклад, якщо твій нік на GitHub - termoSSD:
+GITHUB_VERSION_URL = "https://github.com/termoSSD/below/VERSION"
+
 DEFAULT_SETTINGS = {
     "model": "",
     "project_path": "",
