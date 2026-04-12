@@ -7,7 +7,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SETTINGS_FILE = os.path.join(BASE_DIR, "settings.json")
 MEMORY_DIR = os.path.join(BASE_DIR, "memory")
 
-VERSION = "0.9.6"
+VERSION = "0.9.5"
 GITHUB_VERSION_URL = "https://raw.githubusercontent.com/termoSSD/below/main/VERSION"
 
 DEFAULT_SETTINGS = {
