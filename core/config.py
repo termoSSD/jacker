@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -6,7 +7,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SETTINGS_FILE = os.path.join(BASE_DIR, "settings.json")
 MEMORY_DIR = os.path.join(BASE_DIR, "memory")
 
-VERSION = "0.9.5"
+VERSION = "0.9.6"
 GITHUB_VERSION_URL = "https://raw.githubusercontent.com/termoSSD/below/main/VERSION"
 
 DEFAULT_SETTINGS = {
@@ -18,6 +19,18 @@ DEFAULT_SETTINGS = {
     "auto_update_check": True
 }
 
+'''
+COMPILE SCRIPT
+'''
+
+if getattr(sys, 'frozen', False):
+    BASE_DIR = os.path.dirname(sys.executable)
+else:
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+'''
+FUNCTIONS
+'''
 def load_settings():
     if not os.path.exists(SETTINGS_FILE):
         save_settings(DEFAULT_SETTINGS)
