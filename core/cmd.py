@@ -101,12 +101,16 @@ USAGE:
   <command> [arguments]
 
 AI COMMANDS:
-    ai "<prompt>"               Ask a general question
-    ai file <name> ["prompt"]   Analyze a file (optional custom prompt)
-    ai project                  Run full project analysis
+    ai "<prompt>"             Ask a general question
+    ai file <name> ["prompt"] Analyze a file (optional custom prompt)
+    ai project                Run full project analysis
+          
+    --status                    Check if AI is loaded in RAM/VRAM
+    --load                      Manually trigger AI engine startup    
+    --stop                      Unload AI from memory (Free RAM)
 
-    ai save <name>              Save current session to a file
-    ai load <name>              Load a session from a file
+    ai save <session_name>    Save current session to a file
+    ai load <session_name>    Load a session from a file   
           
 ====================================================================
     """)
@@ -129,7 +133,6 @@ USAGE:
 BASE COMMANDS:
     -m, --model [path]        View current model or set a new one
     -p, --project <path>      Set the project workspace directory
-    --load                    Starting AI
     -astr [on|off]            Toggle auto start AI
     -ctx, --context <size>    Set the context size for the AI model
     --memory [on|off|s]       Enable, disable, or check history status
@@ -141,8 +144,13 @@ AI COMMANDS:
     ai "<prompt>"             Ask a general question
     ai file <name> ["prompt"] Analyze a file (optional custom prompt)
     ai project                Run full project analysis
+          
+    --status                    Check if AI is loaded in RAM/VRAM
+    --load                      Manually trigger AI engine startup    
+    --stop                      Unload AI from memory (Free RAM)
+
     ai save <session_name>    Save current session to a file
-    ai load <session_name>    Load a session from a file          
+    ai load <session_name>    Load a session from a file         
 
 COSMETIC COMMANDS:
     -h, --help [base|ai|csmt] Show this help message

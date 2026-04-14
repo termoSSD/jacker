@@ -1,8 +1,4 @@
-import json
-import datetime
-import os
-import ctypes
-import subprocess
+import json, datetime, gc, os, ctypes, subprocess
 from urllib import response
 from llama_cpp import Llama, llama_log_set, llama_log_callback
 from core.cmd import get_project, print_error, print_info, print_markdown
@@ -51,6 +47,48 @@ def load_llm():
         print_error(f"Engine Error: {e}")
         return False
 
+def load_ai():
+    from core import cmd
+    
+    if _llm_instance is not None:
+        return "AI is already loaded and running."
+    
+    success = load_llm()
+    
+    if success:
+        return "AI Engine started successfully!"
+    else:
+        return "Failed to start AI Engine. Check logs for details."
+
+def unload_ai():
+    global _llm_instance
+    if _llm_instance is None:
+        return "AI is not loaded anyway."
+    
+    try:
+        del _llm_instance
+        _llm_instance = None
+        
+        gc.collect()
+        
+        logger.info("Model unloaded from memory.")
+        return "AI Engine stopped. Memory cleared."
+    except Exception as e:
+        logger.error(f"Error while unloading model: {e}")
+        return f"Error: {e}"
+
+def load_status():
+    if _llm_instance is not None:
+        return "Model Loaded (Active)"
+    
+    path = current_model()
+    if not path:
+        return "No Model Set"
+    if not os.path.exists(path):
+        return "Model file missing"
+        
+    return "Ready to load"
+
 '''
 MODEL MANAGER 
      &
@@ -82,7 +120,6 @@ def change_model(new_model):
 
 def current_model(): 
     return get_setting("model")
-
 
 def ask_ai(prompt, silent=False):
     global _llm_instance, _chat_history
@@ -225,11 +262,6 @@ def load_session(session_name):
         logger.error(f"Error loading session: {e}")
         return f"ERROR loading session: {e}"
 
-
-'''
-1.0.0 NEW: PROJECT SCANNER & GIT INTEGRATION
-'''
-
 def analyze_project():
     project_path = get_project()
     if not project_path or not os.path.exists(project_path):
@@ -248,8 +280,7 @@ def analyze_project():
                 ignore_set.update(custom_ignores)
         except Exception:
             pass 
-    
-    # Збір файлів
+
     for root, dirs, files in os.walk(project_path):
         dirs[:] = [d for d in dirs if d not in ignore_set]
         for file in files:

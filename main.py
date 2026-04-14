@@ -15,7 +15,6 @@ get_or_set_model()
 
 if get_auto_load_status():
         if ai.current_model():
-
             ai.load_llm()
         else:
             print_info("Auto-load is ON, but model path is empty. Use -m to set it.", title="System")
