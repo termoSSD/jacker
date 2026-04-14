@@ -1,4 +1,4 @@
-# 🔽 BElow
+# 🔽 BELOW
 **Advanced Local Development Intelligence**
 
 | | |
