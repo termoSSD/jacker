@@ -1,161 +1,134 @@
 import os
 import re
-from core.ai import ask_ai, change_ctx_size, change_model, current_ctx_size, current_model, load_session, save_session, set_memory_recording, get_memory_status
-from core.cmd import get_app_version, set_auto_clear, set_auto_update, set_project, get_project, clear, show_ai_help_menu, show_base_help_menu, show_full_help_menu, show_cosmetic_menu, read_file, restart_program, exit_program, show_settings, check_for_updates
+from core.ai import (
+    ask_ai, change_ctx_size, change_model, current_ctx_size, current_model, 
+    load_session, save_session, set_memory_recording, get_memory_status
+)
+from core.cmd import (
+    get_app_version, set_auto_clear, set_auto_update, set_project, get_project, 
+    clear, show_ai_help_menu, show_base_help_menu, show_full_help_menu, 
+    show_cosmetic_menu, read_file, restart_program, exit_program, show_menu, show_settings, check_for_updates
+)
+
 
 ALLOWED_EXTENSIONS = {
     '.py', '.js', '.ts', '.html', '.css', '.cpp', 
     '.c', '.h', '.java', '.txt', '.md', '.json', '.go', '.rs'
 }
 
-def handle_command(cmd):
 
-    parts = cmd.lower().split()
-    if not parts:
+def handle_help(args):
+    if args == "base": return show_base_help_menu()
+    if args == "ai": return show_ai_help_menu()
+    if args == "csmt": return show_cosmetic_menu()
+    if args == "-": return show_menu()
+    show_full_help_menu()
+    return None
+
+def handle_clear(args):
+    clear()
+    return None
+
+def handle_settings(args):
+    show_settings()
+    return None
+
+def handle_version(args):
+    if args == "up":
+        check_for_updates(manual_check=True)
         return None
-   
-    # Cosmetic commands    
-    if parts[0] in ("--help", "-h"):
-        if len(parts) > 1:
-            sub = parts[1]
-            if sub == "ai":
-                show_ai_help_menu()
-                return None
-            if sub == "base":
-                show_base_help_menu()
-                return None
-            if sub == "csmt":
-                show_cosmetic_menu()
-                return None
-        
-        show_full_help_menu()
-        return None
-    if cmd.strip() in ("--clear", "-c"):
-        clear()
-        return None
-    if cmd.strip() == "--autoclear off":
-        return set_auto_clear(False)
-    if cmd.strip() == "--autoclear on":
-        return set_auto_clear(True)
-    if cmd.strip() in ("--settings", "-s"):
-        show_settings()
-        return None
-   
-    # Version commands
-    if parts[0] in ("--version", "-v"):
-        if len(parts) > 1 and parts[1] == "up":
-            # Trigger manual update check
-            check_for_updates(manual_check=True)
-            return None # Return None since the function prints the output itself
-            
-        # If just -v is passed, show current version
-        return get_app_version()
-    if parts[0] == "--autoupdate":
-        if len(parts) > 1:
-            if parts[1] == "off":
-                return set_auto_update(False)
-            if parts[1] == "on":
-                return set_auto_update(True)
-        return "Usage: --autoupdate [on|off]"
+    return get_app_version()
+
+def handle_model(args):
+    if args: return change_model(args)
+    return f"Current model: {current_model()}"
+
+def handle_project(args):
+    if args: return set_project(args.strip('"\''))
+    current = get_project()
+    return current if current else "Path empty. Use: -p <path>"
+
+def handle_context(args):
+    if args: return change_ctx_size(args)
+    return f"Current context: {current_ctx_size()}"
+
+def handle_exit(args):
+    exit_program()
+
+def handle_autoclear(args):
+    if args == "off": return set_auto_clear(False)
+    if args == "on": return set_auto_clear(True)
+    return "Usage: --autoclear [on|off]"
+
+def handle_autoupdate(args):
+    if args == "off": return set_auto_update(False)
+    if args == "on": return set_auto_update(True)
+    return "Usage: --autoupdate [on|off]"
+
+def handle_memory(args):
+    if args == "off": return set_memory_recording(False)
+    if args == "on": return set_memory_recording(True)
+    if args == "s": return f"Memory recording: {get_memory_status()}"
+    return "Usage: --memory [on|off|s]"
+
+# --- DISPATCH TABLE ---
+
+COMMANDS = {
+    "-h": handle_help, "--help": handle_help,
+    "-c": handle_clear, "--clear": handle_clear,
+    "-s": handle_settings, "--settings": handle_settings,
+    "-v": handle_version, "--version": handle_version,
+    "-m": handle_model, "--model": handle_model,
+    "-p": handle_project, "--path": handle_project,
+    "-ctx": handle_context, "--context": handle_context,
+    "--autoclear": handle_autoclear,    
+    "--autoupdate": handle_autoupdate,  
+    "--memory": handle_memory,          
+    "-e": handle_exit, "exit": handle_exit,
+    "-r": lambda x: restart_program()
+}
+
+def handle_command(command_text):
+    text = command_text.strip()
+    if not text: return None
+
+    # Розбиваємо введення на базову команду та аргументи
+    parts = text.split(" ", 1)
+    base_cmd = parts[0].lower()
+    args = parts[1].strip() if len(parts) > 1 else ""
+
+    # 1. Перевіряємо, чи є це системна команда зі словника
+    if base_cmd in COMMANDS:
+        return COMMANDS[base_cmd](args)
+
+    # 2. Обробка складних команд AI
     
-    # Path commands
-    if cmd.startswith(("--path ", "-p ")):
-        path = cmd.split(" ", 1)[1].strip()
-        path = path.strip('"\'')
-        return set_project(path)
-    if cmd.startswith(("--path", "-p")):
-        current_path = get_project()
-        if current_path: 
-            return f"{current_path}"
-        else: 
-            return "Path empty USE: -p <path>" 
+    # Збереження / Завантаження сесій
+    if text.startswith("ai save "):
+        return save_session(text[len("ai save "):].strip())
+    if text.startswith("ai load "):
+        return load_session(text[len("ai load "):].strip())
 
-    # AI commands
-    if cmd.startswith('ai "'):
-        clean_prompt = cmd[3:].strip().strip('"\'') + " (write plain text, no markdown, no asterisks)"
+    # Прямий запит
+    if text.startswith('ai "'):
+        clean_prompt = text[3:].strip().strip('"\'')
         return ask_ai(clean_prompt)
-    if cmd.startswith("ai file "):
-        match = re.match(r'ai file\s+([^\s"]+)\s+"([^"]+)"', cmd)
+
+    # Аналіз файлу (Тут обірвався твій код)
+    if text.startswith("ai file "):
+        match = re.match(r'ai file\s+([^\s"]+)\s+"([^"]+)"', text)
+        file_name = match.group(1).strip() if match else text[len("ai file "):].strip()
+        user_prompt = match.group(2).strip() if match else "Analyze this file"
         
-        if match:
-            file_name = match.group(1).strip()
-            user_prompt = match.group(2).strip()
-        else:
-            file_name = cmd[len("ai file "):].strip()
-            user_prompt = "Analyze this file"
-            
         code = read_file(file_name)
         if not code: 
-            return f"Could not read file: {file_name} (Make sure project path is set)"
-
-        full_query = f"{user_prompt}:\n{code}\n\n(Important: Plain text only, no asterisks)"
-        return ask_ai(full_query)
-    if cmd == "ai project":
-        if not get_project():
-            return "Set project first"
-
-        result = ""
-
-        for root, dirs, files in os.walk(get_project()):
-            dirs[:] = [d for d in dirs if not d.startswith('.') and d != '__pycache__']
-           
-            for f in files:
-                ext = os.path.splitext(f)[1].lower()
-                if ext not in ALLOWED_EXTENSIONS:
-                    continue 
-
-                path = os.path.join(root, f)
-                try:
-                    with open(path, "r", encoding="utf-8") as file:
-                        code = file.read()
-
-                    result += f"\n\n--- FILE: {f} ---\n"
-                    result += ask_ai(f"Analyze this file:\n{code}") 
-                except Exception as e:
-                    result += f"\nError reading {f}: {e}"
-
-        return result
-
-    # Model commands
-    if cmd.startswith(("--model ", "-m ")):
-        new_model = cmd.split(" ", 1)[1].strip()
-        return change_model(new_model)
-    if cmd.strip() in ("--model", "-m"):
-        current = current_model()
-        return f"{current}"
-    
-    # Memory recording commands
-    if cmd.strip() == "--memory off":
-        return set_memory_recording(False)
-    if cmd.strip() == "--memory on":
-        return set_memory_recording(True)
-    if cmd.strip() == "--memory s":
-        return f"Memory recording is {get_memory_status()}"
-
-    # Session commands
-    if cmd.startswith("ai save "):
-        session_name = cmd[len("ai save "):].strip()
-        if not session_name:
-            return "Provide a session name (e.g., ai save project1)"
-        return save_session(session_name)
-    if cmd.startswith("ai load "):
-        session_name = cmd[len("ai load "):].strip()
-        if not session_name:
-            return "Provide a session name (e.g., ai load project1)"
-        return load_session(session_name)
-    
-    # Context size commands
-    if cmd.startswith(("--context ", "-ctx ")):
-        new_size = cmd.split(" ", 1)[1].strip()
-        return change_ctx_size(new_size)
-    if cmd.strip() in ("--context", "-ctx"):
-        current = current_ctx_size()
-        return f"Current context size: {current}"
-
-    # Restart and exit commands
-    if cmd.strip() in ("restart", "-r"):
-        restart_program()
-    if cmd.strip() in ("exit", "-e"):
-        exit_program()
+            return f"Could not read file: {file_name} (Set project path first)"
         
-    return None
+        # Отримуємо розширення файлу (наприклад, '.py') і забираємо крапку
+        _, ext = os.path.splitext(file_name)
+        ext_clean = ext.replace(".", "")
+        
+        # Формуємо красивий запит з Markdown
+        final_prompt = f"{user_prompt}:\n\n```{ext_clean}\n{code}\n```"
+        
+        return ask_ai(final_prompt)

@@ -1,31 +1,53 @@
-import os
-import time
-import sys
-import subprocess
-import urllib.request
-from turtle import clear
+import os, time, sys, subprocess, urllib.request
+from rich.console import Console
+from rich.markdown import Markdown
+from rich.panel import Panel
+from rich.text import Text
 from core.logger import get_logger
-from core.ai import current_model, change_model
+from core import ai
 from core.config import VERSION, GITHUB_VERSION_URL, update_setting, get_setting
 
 logger = get_logger(__name__)
+console = Console()
 
 '''
 HELPS MENUS
 '''
 
 def show_menu():
-    clear()
-    print(f"""
-                ____  ______  _                             
-               |  _ \|  ____ | |                            
-               | |_) | |__   | | _____      __              
-               |  _ <|  __|  | |/ _ \ \ /\ / /              
-               | |_) | |____ | | (_) \ V  V /               
-               |____/|______ |_|\___/ \_/\_/                                                
-                         v{VERSION}                            
+    if get_setting("clear_before_menu"): clear()
 
-    """)
+    logo = (
+        " ____  ______  _               \n"
+        "|  _ \\|  ____ | |              \n"
+        "| |_) | |__   | | _____      __\n"
+        "|  _ <|  __|  | |/ _ \\ \\ /\\ / /\n"
+        "| |_) | |____ | | (_) \\ V  V / \n"
+        "|____/|______ |_|\\___/ \\_/\\_/  \n"
+    )
+
+    v_text = f"v {VERSION} (Beta)".center(31)
+    full_text = f"{logo}\n{v_text}"
+
+    console.print(Panel(full_text, style="bold cyan", border_style="blue", padding=(1, 2), expand=False))
+
+def print_markdown(text):
+    console.print(Markdown(text))
+
+def print_info(text, title="BELOW"):
+    console.print(Panel(text, title=title, border_style="green", expand=False))
+
+def print_error(text):
+    console.print(f"[bold red] [ERROR]:[/bold red] {text}")
+
+def clear():
+    if os.name == 'nt':
+        os.system('cls')
+    else: 
+        os.system('clear')
+
+def get_app_version(): 
+    return f"BELOW version {VERSION}"
 
 def show_cosmetic_menu():
     if get_setting("clear_before_menu"):

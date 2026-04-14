@@ -2,8 +2,10 @@ import json
 import datetime
 import os
 import ctypes
+import subprocess
 from urllib import response
 from llama_cpp import Llama, llama_log_set, llama_log_callback
+from core.cmd import get_project, print_error, print_info, print_markdown
 from core.config import get_setting, update_setting, MEMORY_DIR
 from core.logger import get_logger
 
@@ -24,6 +26,7 @@ def suppress_llama_logs(level, message, user_data):
 llama_log_set(suppress_llama_logs, ctypes.c_void_p())
 
 def load_llm():
+    from core import cmd
     global _llm_instance
     model_path = current_model()
     
@@ -34,15 +37,18 @@ def load_llm():
         return False
         
     try:
+        print_info(f"Loading model... (Context: {current_ctx_size()})", title="System")
         _llm_instance = Llama(
             model_path=model_path,
             n_ctx=current_ctx_size(),   # Size of the context window
-            verbose=False # Turn off verbose logging from the Llama library itself to avoid cluttering our logs
+            n_gpu_layers=-1,            # 1.0.0: Максимальне вивантаження у відеокарту
+            verbose=False               # Turn off verbose logging
         )
         logger.info("Model successfully loaded into memory.")
         return True
     except Exception as e:
         logger.exception(f"[CRITICAL ERROR] occurred while loading the model: {e}")
+        print_error(f"Engine Error: {e}")
         return False
 
 '''
@@ -56,14 +62,12 @@ def get_or_set_model():
     if model:
         return model
     
-    # If no model is set, ask the user to input one
     model = ""
     while not model:
         model = input("Enter model: ").strip()
         if not model:
             print("ERROR: Model name cannot be empty.")
             
-    # Save the model to the config file and update the global variable
     change_model(model)
     return model
 
@@ -79,7 +83,8 @@ def change_model(new_model):
 def current_model(): 
     return get_setting("model")
 
-def ask_ai(prompt):
+
+def ask_ai(prompt, silent=False):
     global _llm_instance, _chat_history
     model_path = current_model()
     
@@ -87,49 +92,47 @@ def ask_ai(prompt):
         logger.warning("Attempting to use AI without a set model.")
         return "ERROR: Model is not set. Use -m <path_to_model.gguf>"
 
-    # if model is not loaded yet, try to load it before generating a response
     if _llm_instance is None:
         logger.info("Model not loaded. Initializing load...")
         if not load_llm():
             logger.error("Failed to load model.")
             return "[ERROR] Failed to load model."
 
+    if len(_chat_history) > 15:
+        _chat_history = [_chat_history[0]] + _chat_history[-10:]
+
     _chat_history.append({"role": "user", "content": prompt})
 
     try: 
-        logger.info(f"Sending request to AI: '{prompt[:30]}...'")
+        if not silent:
+            logger.info(f"Sending request to AI: '{prompt[:30]}...'")
 
-        # Streaming enabled (stream=True) for smooth console output
-        stream = _llm_instance.create_chat_completion(
+        response = _llm_instance.create_chat_completion(
             messages=_chat_history, 
             max_tokens=2048,
-            stream=True
+            stream=False 
         )
         
-        full_response = ""
-        for output in stream:
-            delta = output["choices"][0]["delta"]
-            if "content" in delta:
-                chunk = delta["content"]
-                print(chunk, end="", flush=True) 
-                full_response += chunk
-                
-        print() 
+        full_response = response["choices"][0]["message"]["content"]
+        
+        if not silent:
+            print() 
+            print_markdown(full_response)
+            print() 
         
         logger.debug(f"AI response generated (length: {len(full_response)} characters)")
         _chat_history.append({"role": "assistant", "content": full_response})
         
         save_to_memory(prompt, full_response)
         
-        return full_response 
+        return full_response if silent else None
         
     except Exception as e:
         logger.exception("[CRITICAL ERROR] occurred while generating AI response")
         error_msg = f"[ERROR] Error during generation: {e}"
-        print(f"\n{error_msg}")
+        if not silent: print(f"\n{error_msg}")
 
         _chat_history.pop()
-        
         return error_msg   
 
 
@@ -146,7 +149,6 @@ def change_ctx_size(new_size):
         update_setting("ctx_size", size_int)
         logger.info(f"Context size changed to {size_int}")
         
-        # If the model is already loaded, reload it with the new memory size
         global _llm_instance
         if _llm_instance is not None:
             print(f"\nReloading model with new memory size ({size_int})...")
@@ -159,7 +161,7 @@ def change_ctx_size(new_size):
         return "ERROR: Please enter a number (e.g., -ctx 2048)"
 
 def current_ctx_size():
-    return get_setting("ctx_size")
+    return get_setting("ctx_size", default=2048)
 
 '''
 HISTORY MANAGER
@@ -174,7 +176,7 @@ def get_memory_status():
     return "ON" if get_setting("record_history") else "OFF"
 
 '''
-SESION MANAGER
+SESSION MANAGER
 '''
 
 def save_to_memory(prompt, response):
@@ -193,13 +195,11 @@ def save_to_memory(prompt, response):
         file.write("=" * 60 + "\n\n")
 
 def save_session(session_name):
-    # Create memory directory if it doesn't exist
     if not os.path.exists(MEMORY_DIR):
         os.makedirs(MEMORY_DIR)
     
     file_path = os.path.join(MEMORY_DIR, f"{session_name}.json")
     try:
-        # Save the entire chat history in JSON format
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(_chat_history, f, indent=4, ensure_ascii=False)
         return f"Session successfully saved to {session_name}.json"
@@ -215,7 +215,6 @@ def load_session(session_name):
         return f"ERROR: Session '{session_name}' not found in memory."
         
     try:
-        # Load the JSON back into memory
         with open(file_path, "r", encoding="utf-8") as f:
             loaded_history = json.load(f)
             
@@ -225,3 +224,60 @@ def load_session(session_name):
     except Exception as e:
         logger.error(f"Error loading session: {e}")
         return f"ERROR loading session: {e}"
+
+
+'''
+1.0.0 NEW: PROJECT SCANNER & GIT INTEGRATION
+'''
+
+def analyze_project():
+    project_path = get_project()
+    if not project_path or not os.path.exists(project_path):
+        return "[ERROR] Project path invalid or not set. Use: -p <path>"
+
+    from func import ALLOWED_EXTENSIONS 
+    
+    files_to_read = []
+    ignore_set = {'.git', '__pycache__', 'node_modules', 'venv', 'env', 'build', 'dist', '.idea', '.vscode'}
+
+    ignore_file = os.path.join(project_path, '.belowignore')
+    if os.path.exists(ignore_file):
+        try:
+            with open(ignore_file, 'r', encoding='utf-8') as f:
+                custom_ignores = {line.strip() for line in f if line.strip() and not line.startswith('#')}
+                ignore_set.update(custom_ignores)
+        except Exception:
+            pass 
+    
+    # Збір файлів
+    for root, dirs, files in os.walk(project_path):
+        dirs[:] = [d for d in dirs if d not in ignore_set]
+        for file in files:
+            if os.path.splitext(file)[1].lower() in ALLOWED_EXTENSIONS:
+                files_to_read.append(os.path.join(root, file))
+
+    if not files_to_read: 
+        return "No supported code files found."
+
+    print_info(f"Found {len(files_to_read)} files. Starting analysis...", title="Project Scanner")
+
+    full_context = "This is a local project analysis. Below is the source code of the project:\n\n"
+    
+    for file_path in files_to_read:
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            rel_path = os.path.relpath(file_path, project_path)
+            _, extension = os.path.splitext(file_path)
+            lang = extension.replace(".", "")
+            
+            # Додаємо файл до загального контексту
+            full_context += f"File: {rel_path}\n```{lang}\n{content}\n```\n\n"
+            
+        except Exception as e:
+            logger.error(f"Error reading {file_path}: {e}")
+
+    full_context += "Please provide a brief overview of this project architecture and main functionality."
+
+    return ask_ai(full_context)

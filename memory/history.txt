@@ -61,3 +61,171 @@ AI Response:
 Hello! How can I assist you today?
 ============================================================
 
+[2026-04-12 22:07:41]
+Prompt:
+hello say hi dima (write plain text, no markdown, no asterisks)
+
+AI Response:
+Hi Dima
+============================================================
+
+[2026-04-12 22:09:05]
+Prompt:
+say hi (write plain text, no markdown, no asterisks)
+
+AI Response:
+Hi
+============================================================
+
+[2026-04-12 22:10:50]
+Prompt:
+code review:
+import os
+import time
+from core.config import get_setting
+from core.ai import get_or_set_model
+from core.cmd import clear, show_menu, print_smoothly, check_for_updates
+from func import handle_command
+
+if os.name == 'nt':
+    os.system('cls && mode con: cols=120 lines=30')
+    
+time.sleep(0.1)
+clear()
+
+print("Loading AI Assistant...")
+for i in range(101):
+    print(f"\rLoading {i}%", end="", flush=True)
+    time.sleep(0.005)
+
+print("\n     - Ready!\n")
+
+get_or_set_model()
+show_menu()
+
+if get_setting("auto_update_check"):
+    check_for_updates()
+
+while True:
+    cmd = input(">> ").strip()
+    if not cmd:
+        continue
+
+    result = handle_command(cmd)
+    
+    if result is not None and str(result).strip():
+        if not cmd.startswith("ai"):
+            print("\n== ", end="") 
+            print_smoothly(str(result), delay=0.01)
+            print()
+
+
+
+(Important: Plain text only, no asterisks)
+
+AI Response:
+Your code looks well-structured and functional. Here are a few suggestions for improvement:
+
+1. **Error Handling**: Add error handling around the `get_or_set_model()` and `check_for_updates()` functions to manage any potential exceptions that might occur during their execution.
+
+2. **Code Comments**: Add comments to explain the purpose of each major block of code, especially the loops and conditional statements, to make the code easier to understand for others.
+
+3. **Function Documentation**: Document each function with a docstring that describes what the function does, its parameters, and its return value. This will help other developers understand how to use your functions.
+
+4. **Variable Naming**: Ensure that variable names are descriptive and follow Python's naming conventions. For example, `cmd` could be renamed to `user_input` to make its purpose clearer.
+
+5. **Code Formatting**: Ensure consistent formatting throughout the code, such as using spaces instead of tabs for indentation.
+
+6. **Security**: Be cautious with the use of `os.system('cls && mode con: cols=120 lines=30')`. This command can be dangerous if not properly sanitized, especially if it's used to execute user-provided input.
+
+Overall, your code is clean and functional, but with these improvements, it will be even better.
+============================================================
+
+[2026-04-14 15:53:49]
+Prompt:
+hello (write plain text, no markdown, no asterisks)
+
+AI Response:
+Hello! How can I assist you today?
+============================================================
+
+[2026-04-14 17:09:27]
+Prompt:
+hi
+
+AI Response:
+Hello! How can I assist you today?
+============================================================
+
+[2026-04-14 17:10:29]
+Prompt:
+hi
+
+AI Response:
+Hello! How can I assist you today?
+============================================================
+
+[2026-04-14 17:22:33]
+Prompt:
+hi
+
+AI Response:
+Hello! How can I assist you today?
+============================================================
+
+[2026-04-14 17:23:06]
+Prompt:
+hi
+
+AI Response:
+Hello! How can I assist you today?
+============================================================
+
+[2026-04-14 17:53:19]
+Prompt:
+hi
+
+AI Response:
+Hello! How can I assist you today?
+============================================================
+
+[2026-04-14 17:57:44]
+Prompt:
+hi
+
+AI Response:
+Hello! How can I assist you today?
+============================================================
+
+[2026-04-14 17:58:12]
+Prompt:
+say have
+
+AI Response:
+Have
+============================================================
+
+[2026-04-14 17:58:30]
+Prompt:
+thank u
+
+AI Response:
+You're welcome! Let me know if there's anything else I can help with.
+============================================================
+
+[2026-04-14 17:58:52]
+Prompt:
+say your name and your creator
+
+AI Response:
+I am Qwen, created by Alibaba Cloud.
+============================================================
+
+[2026-04-14 17:59:01]
+Prompt:
+bye
+
+AI Response:
+Goodbye! Take care.
+============================================================
+
