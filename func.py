@@ -1,7 +1,7 @@
 import os
 import re
 from core.ai import (
-    ask_ai, change_ctx_size, change_model, current_ctx_size, current_model, 
+    ask_ai, change_ctx_size, change_model, current_ctx_size, current_model, load_llm, 
     load_session, save_session, set_memory_recording, get_memory_status
 )
 from core.cmd import (
@@ -80,6 +80,9 @@ def handle_autoload(args):
     status = "ON" if get_auto_load_status() else "OFF"
     return f"Auto-load is {status}. Use: --autoload on/off"
 
+def handle_load(args):
+    return load_llm()
+
 # --- DISPATCH TABLE ---
 
 COMMANDS = {
@@ -91,6 +94,7 @@ COMMANDS = {
     "-p": handle_project, "--path": handle_project,
     "-ctx": handle_context, "--context": handle_context,
     "-astr": handle_autoload,
+    "--load": handle_load,
     "--autoclear": handle_autoclear,    
     "--autoupdate": handle_autoupdate,  
     "--memory": handle_memory,          

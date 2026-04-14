@@ -129,6 +129,7 @@ USAGE:
 BASE COMMANDS:
     -m, --model [path]        View current model or set a new one
     -p, --project <path>      Set the project workspace directory
+    --load                    Starting AI
     -astr [on|off]            Toggle auto start AI
     -ctx, --context <size>    Set the context size for the AI model
     --memory [on|off|s]       Enable, disable, or check history status
