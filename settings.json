@@ -4,5 +4,6 @@
     "record_history": true,
     "ctx_size": 16384,
     "clear_before_menu": true,
-    "auto_update_check": false
+    "auto_update_check": false,
+    "auto_load": false
 }

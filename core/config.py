@@ -54,3 +54,10 @@ def update_setting(key, value):
     settings = load_settings()
     settings[key] = value
     save_settings(settings)
+
+def set_auto_load(state: bool):
+    update_setting("auto_load", state)
+    return f"Auto-load model on start: {'ON' if state else 'OFF'}"
+
+def get_auto_load_status():
+    return get_setting("auto_load", default=True)

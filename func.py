@@ -9,6 +9,9 @@ from core.cmd import (
     clear, show_ai_help_menu, show_base_help_menu, show_full_help_menu, 
     show_cosmetic_menu, read_file, restart_program, exit_program, show_menu, show_settings, check_for_updates
 )
+from core.config import (
+    get_auto_load_status, set_auto_load
+)
 
 
 ALLOWED_EXTENSIONS = {
@@ -71,6 +74,12 @@ def handle_memory(args):
     if args == "s": return f"Memory recording: {get_memory_status()}"
     return "Usage: --memory [on|off|s]"
 
+def handle_autoload(args):
+    if args == "on": return set_auto_load(True)
+    if args == "off": return set_auto_load(False)
+    status = "ON" if get_auto_load_status() else "OFF"
+    return f"Auto-load is {status}. Use: --autoload on/off"
+
 # --- DISPATCH TABLE ---
 
 COMMANDS = {
@@ -81,6 +90,7 @@ COMMANDS = {
     "-m": handle_model, "--model": handle_model,
     "-p": handle_project, "--path": handle_project,
     "-ctx": handle_context, "--context": handle_context,
+    "-astr": handle_autoload,
     "--autoclear": handle_autoclear,    
     "--autoupdate": handle_autoupdate,  
     "--memory": handle_memory,          
