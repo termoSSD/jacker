@@ -3,9 +3,9 @@ from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.text import Text
-from core.logger import get_logger
+from core.utils.logger import get_logger
 from core import ai
-from core.config import VERSION, GITHUB_VERSION_URL, update_setting, get_setting
+from core.utils.config import VERSION, GITHUB_VERSION_URL, update_setting, get_setting
 
 logger = get_logger(__name__)
 console = Console()
@@ -289,7 +289,7 @@ def read_file(name):
     return None
 
 def get_project():
-    return get_setting("project_path")
+    return get_setting("path")
 
 def set_project(path):
     if not os.path.exists(path):

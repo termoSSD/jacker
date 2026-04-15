@@ -1,15 +1,37 @@
-import json, datetime, gc, os, ctypes, subprocess
+import json, datetime, gc, os, ctypes, subprocess, re
 from llama_cpp import Llama, llama_log_set, llama_log_callback
-from core.cmd import get_project, print_error, print_info, print_markdown
-from core.config import get_setting, update_setting, MEMORY_DIR
-from core.logger import get_logger
+from core.utils.cmd_ui import get_project, print_error, print_info, print_markdown
+from core.utils.config import get_setting, update_setting, MEMORY_DIR
+from core.utils.logger import get_logger
+from core.ai.prompts import get_system_prompt
+from core.tools.pc_control import execute_system_command
 
 _llm_instance = None
 logger = get_logger(__name__)
 
-_chat_history = [
-    {"role": "system", "content": "You are a helpful AI development assistant. Answer concisely."}
-]
+def get_system_prompt():
+    import platform
+    import datetime
+    from core.utils.cmd_ui import get_project
+    
+    os_info = f"{platform.system()} {platform.release()}"
+    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    path = get_project() or "Not selected"
+    
+    prompt = (
+        f"Your name is Marko. You are an elite, local AI daemon running directly on the user's machine ({os_info}).\n"
+        f"[SYSTEM DATA]\n"
+        f"- Current Time: {current_time}\n"
+        f"- Current Workspace: {path}\n"
+        f"-----------------\n"
+        "Your primary role is expert software engineering, specifically focusing on Python architecture and complex C++ data structures. "
+        "Communication style: direct, structurally precise, highly reliable, and subtly elegant. "
+        "Rules: No emojis. No robotic clichés (never say 'As an AI'). Answer directly without introductory fluff. "
+        "When writing code, prioritize optimal performance, memory safety, and clean architecture."
+    )
+    return prompt
+
+_chat_history = []
 
 '''
 LLAMA MANAGER
@@ -21,7 +43,6 @@ def suppress_llama_logs(level, message, user_data):
 llama_log_set(suppress_llama_logs, ctypes.c_void_p())
 
 def load_llm():
-    from core import cmd
     global _llm_instance
     model_path = current_model()
     
@@ -46,9 +67,7 @@ def load_llm():
         print_error(f"Engine Error: {e}")
         return False
 
-def load_ai():
-    from core import cmd
-    
+def load_ai():    
     if _llm_instance is not None:
         return "AI is already loaded and running."
     
@@ -139,6 +158,11 @@ def ask_ai(prompt, silent=False):
 
     _chat_history.append({"role": "user", "content": prompt})
 
+    if not _chat_history or _chat_history[0].get("role") != "system":
+        _chat_history.insert(0, {"role": "system", "content": get_system_prompt()})
+    else:
+        _chat_history[0]["content"] = get_system_prompt()
+
     try: 
         if not silent:
             logger.info(f"Sending request to AI: '{prompt[:30]}...'")
@@ -150,10 +174,18 @@ def ask_ai(prompt, silent=False):
         )
         
         full_response = response["choices"][0]["message"]["content"]
+        commands = re.findall(r'\[CMD:\s*(.*?)\s*\|\s*(.*?)\s*\]', full_response)
         
+        for action, target in commands:
+            if not silent:
+                print_info(f"Executing: {action} -> {target}", title="System Interface")
+            execute_system_command(action, target)
+            
+        display_response = re.sub(r'\[CMD:\s*.*?\s*\|\s*.*?\s*\]', '', full_response).strip()
+
         if not silent:
             print() 
-            print_markdown(full_response)
+            print_markdown(display_response)
             print() 
         
         logger.debug(f"AI response generated (length: {len(full_response)} characters)")
