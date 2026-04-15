@@ -266,7 +266,7 @@ def analyze_project():
     if not project_path or not os.path.exists(project_path):
         return "[ERROR] Project path invalid or not set. Use: -p <path>"
 
-    from func import ALLOWED_EXTENSIONS 
+    from core.dispatcher import ALLOWED_EXTENSIONS
     
     files_to_read = []
     ignore_set = {'.git', '__pycache__', 'node_modules', 'venv', 'env', 'build', 'dist', '.idea', '.vscode'}

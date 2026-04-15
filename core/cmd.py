@@ -40,15 +40,6 @@ def print_info(text, title="BELOW"):
 def print_error(text):
     console.print(f"[bold red] [ERROR]:[/bold red] {text}")
 
-def clear():
-    if os.name == 'nt':
-        os.system('cls')
-    else: 
-        os.system('clear')
-
-def get_app_version(): 
-    return f"BELOW version {VERSION}"
-
 def show_cosmetic_menu():
     if get_setting("clear_before_menu"):
         clear()

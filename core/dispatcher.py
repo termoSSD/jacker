@@ -105,18 +105,13 @@ def handle_command(command_text):
     text = command_text.strip()
     if not text: return None
 
-    # Розбиваємо введення на базову команду та аргументи
     parts = text.split(" ", 1)
     base_cmd = parts[0].lower()
     args = parts[1].strip() if len(parts) > 1 else ""
 
-    # 1. Перевіряємо, чи є це системна команда зі словника
     if base_cmd in COMMANDS:
         return COMMANDS[base_cmd](args)
 
-    # 2. Обробка складних команд AI
-    
-    # Збереження / Завантаження сесій
     if text.startswith("ai save "):
         return save_session(text[len("ai save "):].strip())
     if text.startswith("ai load "):
@@ -127,7 +122,6 @@ def handle_command(command_text):
         clean_prompt = text[3:].strip().strip('"\'')
         return ask_ai(clean_prompt)
 
-    # Аналіз файлу (Тут обірвався твій код)
     if text.startswith("ai file "):
         match = re.match(r'ai file\s+([^\s"]+)\s+"([^"]+)"', text)
         file_name = match.group(1).strip() if match else text[len("ai file "):].strip()
@@ -145,3 +139,6 @@ def handle_command(command_text):
         final_prompt = f"{user_prompt}:\n\n```{ext_clean}\n{code}\n```"
         
         return ask_ai(final_prompt)
+    if text == "ai project":
+        from core.ai import analyze_project
+        return analyze_project()

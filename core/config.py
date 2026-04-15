@@ -47,11 +47,6 @@ def load_settings():
     except Exception:
         return {}
 
-
-def save_settings(settings_dict):
-    with open(SETTINGS_FILE, "w", encoding="utf-8") as file:
-        json.dump(settings_dict, file, indent=4, ensure_ascii=False)
-
 def get_setting(key, default=None):
     settings = load_settings()
     return settings.get(key, default)
