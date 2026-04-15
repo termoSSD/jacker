@@ -3,7 +3,7 @@
 
 | | |
 |---|---|
-| **Version** | 0.9.5 |
+| **Version** | 1.0.1 |
 | **Type** | Command Line Interface (CLI) |
 | **Status** | Beta |
 | **License** | GPL-3.0 |
@@ -341,4 +341,4 @@ For issues, questions, or feedback:
 
 ---
 
-**Last Updated:** April 12, 2026 | **Version:** 0.9.5
+**Last Updated:** April 12, 2026 | **Version:** 1.0.1
