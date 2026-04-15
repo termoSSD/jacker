@@ -3,9 +3,9 @@ from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.text import Text
-from core.logger import get_logger
+from core.utils.logger import get_logger
 from core import ai
-from core.config import VERSION, GITHUB_VERSION_URL, update_setting, get_setting
+from core.utils.config import VERSION, GITHUB_VERSION_URL, update_setting, get_setting
 
 logger = get_logger(__name__)
 console = Console()
@@ -26,7 +26,7 @@ def show_menu():
         "|____/|______ |_|\\___/ \\_/\\_/  \n"
     )
 
-    v_text = f"v {VERSION} (Beta)".center(31)
+    v_text = f"v {VERSION}".center(31)
     full_text = f"{logo}\n{v_text}"
 
     console.print(Panel(full_text, style="bold cyan", border_style="blue", padding=(1, 2), expand=False))
@@ -289,7 +289,7 @@ def read_file(name):
     return None
 
 def get_project():
-    return get_setting("project_path")
+    return get_setting("path")
 
 def set_project(path):
     if not os.path.exists(path):

@@ -1,6 +1,6 @@
 import os
 import logging
-from core.config import BASE_DIR
+from core.utils.config import BASE_DIR
 
 # 1. Directory for logs
 LOG_DIR = os.path.join(BASE_DIR, "LOG")

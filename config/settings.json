@@ -1,9 +1,9 @@
 {
-    "model": "C:\\source\\models\\qwen2.5-coder-14b.gguf",
-    "project_path": "C:\\source\\AI_assistant",
+    "model": "C:\\source\\models\\qwen2.5-coder.gguf",
+    "project_path": "C:\\source\\models\\qwen2.5-coder.gguf",
     "record_history": true,
-    "ctx_size": 16384,
+    "ctx_size": 4096,
     "clear_before_menu": true,
     "auto_update_check": false,
-    "auto_load": false
+    "auto_load": true
 }

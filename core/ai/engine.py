@@ -1,15 +1,38 @@
-import json, datetime, gc, os, ctypes, subprocess
+import json, datetime, gc, os, ctypes, subprocess, re
 from llama_cpp import Llama, llama_log_set, llama_log_callback
-from core.cmd import get_project, print_error, print_info, print_markdown
-from core.config import get_setting, update_setting, MEMORY_DIR
-from core.logger import get_logger
+from core.tools.web import search_web
+from core.utils.cmd_ui import get_project, print_error, print_info, print_markdown
+from core.utils.config import get_setting, update_setting, MEMORY_DIR
+from core.utils.logger import get_logger
+from core.ai.prompts import get_system_prompt
+from core.tools.pc_control import execute_system_command
 
 _llm_instance = None
 logger = get_logger(__name__)
 
-_chat_history = [
-    {"role": "system", "content": "You are a helpful AI development assistant. Answer concisely."}
-]
+def get_system_prompt():
+    import platform
+    import datetime
+    from core.utils.cmd_ui import get_project
+    
+    os_info = f"{platform.system()} {platform.release()}"
+    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    path = get_project() or "Not selected"
+    
+    prompt = (
+        f"Your name is Markus. You are an elite, local AI daemon running directly on the user's machine ({os_info}).\n"
+        f"[SYSTEM DATA]\n"
+        f"- Current Time: {current_time}\n"
+        f"- Current Workspace: {path}\n"
+        f"-----------------\n"
+        "Your primary role is expert software engineering, specifically focusing on Python architecture and complex C++ data structures. "
+        "Communication style: direct, structurally precise, highly reliable, and subtly elegant. "
+        "Rules: No emojis. No robotic clichés (never say 'As an AI'). Answer directly without introductory fluff. "
+        "When writing code, prioritize optimal performance, memory safety, and clean architecture."
+    )
+    return prompt
+
+_chat_history = []
 
 '''
 LLAMA MANAGER
@@ -21,14 +44,13 @@ def suppress_llama_logs(level, message, user_data):
 llama_log_set(suppress_llama_logs, ctypes.c_void_p())
 
 def load_llm():
-    from core import cmd
     global _llm_instance
     model_path = current_model()
     
-    logger.info(f"Спроба завантажити модель за шляхом: {model_path}")
+    logger.info(f"Attempting to load model from path: {model_path}")
     
     if not model_path or not os.path.exists(model_path):
-        logger.error(f"Файл моделі не знайдено: {model_path}")
+        logger.error(f"Model file not found: {model_path}")
         return False
         
     try:
@@ -46,9 +68,7 @@ def load_llm():
         print_error(f"Engine Error: {e}")
         return False
 
-def load_ai():
-    from core import cmd
-    
+def load_ai():    
     if _llm_instance is not None:
         return "AI is already loaded and running."
     
@@ -125,53 +145,78 @@ def ask_ai(prompt, silent=False):
     model_path = current_model()
     
     if not model_path:
-        logger.warning("Attempting to use AI without a set model.")
-        return "ERROR: Model is not set. Use -m <path_to_model.gguf>"
+        return "ERROR: Model is not set."
 
     if _llm_instance is None:
-        logger.info("Model not loaded. Initializing load...")
-        if not load_llm():
-            logger.error("Failed to load model.")
-            return "[ERROR] Failed to load model."
+        if not load_llm(): return "[ERROR] Failed to load model."
 
     if len(_chat_history) > 15:
         _chat_history = [_chat_history[0]] + _chat_history[-10:]
 
-    _chat_history.append({"role": "user", "content": prompt})
+    if not _chat_history or _chat_history[0].get("role") != "system":
+        _chat_history.insert(0, {"role": "system", "content": get_system_prompt()})
+
+    user_content = prompt
+    if "WEB SEARCH RESULTS" not in prompt:
+        user_content += "\n\n[SYSTEM: If you need real-time data, use EXACTLY: [CMD: SEARCH | query].]"
+
+    _chat_history.append({"role": "user", "content": user_content})
 
     try: 
-        if not silent:
-            logger.info(f"Sending request to AI: '{prompt[:30]}...'")
+        if not silent: logger.info(f"Sending request to AI...")
 
         response = _llm_instance.create_chat_completion(
             messages=_chat_history, 
             max_tokens=2048,
             stream=False 
         )
-        
+
         full_response = response["choices"][0]["message"]["content"]
+        commands = re.findall(r'\[CMD:\s*(.*?)\s*\|\s*(.*?)\s*\]', full_response)
         
-        if not silent:
+        for action, target in commands:
+            action = action.upper().strip()
+
+            if action == "SEARCH":  
+                search_results = search_web(target)
+                _chat_history.append({"role": "system", "content": f"Search results:\n{search_results}\n\nIf you see a specific URL that likely contains the answer, use [CMD: BROWSE | url]. Otherwise, answer now."})
+                return ask_ai(f"I found some links for '{target}'. Look at them. If one looks perfect, browse it. If you have enough info, just answer the user.", silent=silent)
+
+            elif action == "BROWSE":
+                if not silent:
+                    from core.utils.cmd_ui import print_info
+                    print_info(f"Reading page: {target}...", title="Web Agent")
+                
+                from core.tools.web import fetch_page_content
+                page_text = fetch_page_content(target)
+                
+                _chat_history.append({"role": "system", "content": f"Content of {target}:\n{page_text}"})
+                return ask_ai(
+    f"I just read {target}. If it contains weather data (temp/humidity), tell the user. "
+    "IF THE DATA IS MISSING OR IRRELEVANT, DO NOT APOLOGIZE. "
+    "Instead, look at the previous search results and BROWSE a different URL, or just use the snippets. "
+    "Answer in Ukrainian.", 
+    silent=silent
+)
+            
+        display_response = re.sub(r'\[CMD:\s*.*?\s*\|\s*.*?\s*\]', '', full_response).strip()
+        
+        if not silent and display_response:
             print() 
-            print_markdown(full_response)
+            from core.utils.cmd_ui import print_markdown
+            print_markdown(display_response)
             print() 
         
-        logger.debug(f"AI response generated (length: {len(full_response)} characters)")
         _chat_history.append({"role": "assistant", "content": full_response})
-        
         save_to_memory(prompt, full_response)
         
         return full_response if silent else None
         
     except Exception as e:
-        logger.exception("[CRITICAL ERROR] occurred while generating AI response")
-        error_msg = f"[ERROR] Error during generation: {e}"
-        if not silent: print(f"\n{error_msg}")
-
+        logger.exception("AI Error")
         _chat_history.pop()
-        return error_msg   
-
-
+        return f"[ERROR]: {e}"
+    
 '''
 RAM SIZE MANAGER
 '''

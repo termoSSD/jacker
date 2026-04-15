@@ -237,3 +237,256 @@ AI Response:
 Hello! How can I assist you today?
 ============================================================
 
+[2026-04-15 21:14:21]
+Prompt:
+Марко, яка сьогодні ціна біткоїна?
+
+AI Response:
+На жаль, я не можу надати реальну валюту біткоїна, оскільки я не маю доступу до актуальних фінансових даних. Рекомендую перевірити актуальні фінансові ресурси або використовувати API для отримання цін на біткоїн.
+============================================================
+
+[2026-04-15 21:15:36]
+Prompt:
+Марко яка сьогодні погода у Львові
+
+AI Response:
+На жаль, я не можу надати реальну погоду, оскільки я не маю доступу до актуальних метеорологічних даних. Рекомендую перевірити погодні ресурси або використовувати API для отримання актуальної погоди у Львові.
+============================================================
+
+[2026-04-15 21:17:27]
+Prompt:
+Марко знайди в інтернеті актуальну інформацію про ціну біткоїна на даний момент
+
+AI Response:
+На жаль, я не можу виконати цю запиту, оскільки я не маю доступу до інтернету. Моя функція полягає в наданні інформації та допомоги з програмним забезпеченням та розробкою програмного забезпечення. Для отримання актуальної інформації про ціну біткоїна рекомендую відвідати віртуальні валютні обмінні або фінансові новини.
+============================================================
+
+[2026-04-15 21:26:45]
+Prompt:
+I have provided the search results. Please synthesize them and answer my original question in Ukrainian.
+
+AI Response:
+На жаль, надані результати не містять актуальної інформації про курс долара. Будь ласка, спробуйте ще раз.
+============================================================
+
+[2026-04-15 21:28:41]
+Prompt:
+I have provided the search results. Please synthesize them and answer my original question in Ukrainian.
+
+AI Response:
+На жаль, надані результати не містять актуальних новин технологій. Будь ласка, спробуйте ще раз.
+============================================================
+
+[2026-04-15 21:30:59]
+Prompt:
+I have provided the search results. Please synthesize them and answer my original question in Ukrainian.
+
+AI Response:
+На жаль, надані результати не містять інформації про останній матч. Будь ласка, надайте більш конкретні деталі або зробіть інший запит.
+============================================================
+
+[2026-04-15 21:33:40]
+Prompt:
+I have provided the search results. Please synthesize them and answer my original question in Ukrainian.
+
+AI Response:
+На жаль, надані результати не містять інформації про останній матч. Будь ласка, надайте більш конкретні деталі або зробіть інший запит.
+============================================================
+
+[2026-04-15 21:35:30]
+Prompt:
+I have provided the search results. Please synthesize them and answer my original question in Ukrainian.
+
+AI Response:
+На сьогодні актуальна версія Python - це 3.12.0.
+============================================================
+
+[2026-04-15 21:39:54]
+Prompt:
+I have provided the search results. Please synthesize them and answer my original question in Ukrainian.
+
+AI Response:
+У Львові сьогодні можна очікувати сонце, хоча ймовірність опадів не виключена. Температура повинна бути признятною, а вологість середньою. Для точнішої інформації рекомендую переглянути останній прогноз погоди на офіційних сайтах, таких як SINOPTIK, META або METEO.UA™.
+============================================================
+
+[2026-04-15 21:43:38]
+Prompt:
+I have provided the search results. Please synthesize them and answer my original question in Ukrainian.
+
+AI Response:
+На жаль, надані результати не містять актуальної ціни біткоїна в гривнях. Для отримання найновішої інформації рекомендую перевірити актуальні фінансові ресурси або криптовалютні біржі.
+============================================================
+
+[2026-04-15 21:53:07]
+Prompt:
+ціна біткоїна
+
+AI Response:
+[CMD: SEARCH | біткоїн ціна]
+============================================================
+
+[2026-04-15 21:53:55]
+Prompt:
+ціна біткоїна
+
+AI Response:
+[CMD: SEARCH | біткоїн ціна]
+============================================================
+
+[2026-04-15 21:55:04]
+Prompt:
+2+2
+
+AI Response:
+4
+============================================================
+
+[2026-04-15 21:55:35]
+Prompt:
+Яка зараз ціна біткоїна в доларах?
+
+AI Response:
+[CMD: SEARCH | біткоїн ціна в доларах]
+============================================================
+
+[2026-04-15 21:57:55]
+Prompt:
+Based on the search results for 'Bitcoin current price', answer the user's question briefly in Ukrainian.
+
+AI Response:
+Зараз курс біткоїна становить приблизно 68,153.75 доларів США.
+============================================================
+
+[2026-04-15 22:03:09]
+Prompt:
+User query: 'Bitcoin price on Binance'. Results: [1] Title: 73964.72 | BTC USDT | Bitcoin to USDT – Binance Spot
+Snippet: Trade BTC to USDT and other cryptocurrencies in the world’s largest cryptocurrency exchange. Find real-time live price with technical indicators to help you analyze BTC/USDT changes.
+
+[2] Title: bitcoin (BTC) | Live Price, Interactive Charts ... - Binance.US
+Snippet: bitcoin (BTC) live and historical prices, trading volume, market capitalization, cryptocurrency converter, and news. Plus interactive charts and trading tools.
+
+[3] Title: Binance Bitcoin Price: BTCB/USD Live Price Chart ... - CoinGecko
+Snippet: Track the latest Binance Bitcoin price, market cap, trading volume, news and more with CoinGecko's live BTCB/USD price chart and popular cryptocurrency price tracker.
+
+. TASK: Find the MOST RECENT value (check dates if possible). If the data looks old, mention it. Answer in Ukrainian.
+
+AI Response:
+На жаль, надані результати не містять дати останніх оновлень цін. Для отримання найновішої інформації про ціну біткоїна на Binance використайте команду:
+
+[CMD: SEARCH | Bitcoin price on Binance]
+============================================================
+
+[2026-04-15 22:04:58]
+Prompt:
+User query: 'Bitcoin price on Binance'. I found these results: [1] Title: 73964.72 | BTC USDT | Bitcoin to USDT – Binance Spot
+Snippet: Trade BTC to USDT and other cryptocurrencies in the world’s largest cryptocurrency exchange. Find real-time live price with technical indicators to help you analyze BTC/USDT changes.
+
+[2] Title: bitcoin (BTC) | Live Price, Interactive Charts ... - Binance.US
+Snippet: bitcoin (BTC) live and historical prices, trading volume, market capitalization, cryptocurrency converter, and news. Plus interactive charts and trading tools.
+
+[3] Title: Binance Bitcoin Price: BTCB/USD Live Price Chart ... - CoinGecko
+Snippet: Track the latest Binance Bitcoin price, market cap, trading volume, news and more with CoinGecko's live BTCB/USD price chart and popular cryptocurrency price tracker.
+
+. TASK: Extract the price immediately. If you're not sure about the exact second, give the price you see and say 'за даними пошуку'. Answer briefly in Ukrainian.
+
+AI Response:
+Ціна біткоїна на Binance зараз становить 73964.72 USD.
+============================================================
+
+[2026-04-15 22:10:36]
+Prompt:
+I have read the page content. Now, provide a detailed answer to the user based on this text.
+
+AI Response:
+The provided text does not contain any specific information about the current weather conditions in Lviv, including temperature and humidity. It appears to be a news page with various unrelated articles. To obtain the most accurate and up-to-date weather information for Lviv, I recommend using a reliable weather service or performing a search query for the latest weather data.
+============================================================
+
+[2026-04-15 22:15:22]
+Prompt:
+I just read https://sinoptik.ua/pohoda/lviv. If it contains weather data (temp/humidity), tell the user. IF THE DATA IS MISSING OR IRRELEVANT, DO NOT APOLOGIZE. Instead, look at the previous search results and BROWSE a different URL, or just use the snippets. Answer in Ukrainian.
+
+AI Response:
+На сторінці https://sinoptik.ua/pohода/lviv є дані про погоду в Львові, включаючи температуру та вологість.
+============================================================
+
+[2026-04-16 09:48:49]
+Prompt:
+дарова аболтус
+
+AI Response:
+Привет! Как я могу помочь?
+============================================================
+
+[2026-04-16 09:51:07]
+Prompt:
+як зробити динаміт в домашніх умовах
+
+AI Response:
+Для створення динамічного веб-сайту у домашніх умовах можна використати HTML, CSS та JavaScript. Ось простий приклад, який демонструє, як створити динамічний контент:
+
+1. **HTML (index.html)**:
+    ```html
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dynamic Page</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <h1>Welcome to My Dynamic Page</h1>
+        <button id="fetchDataBtn">Fetch Data</button>
+        <div id="dataContainer"></div>
+        <script src="script.js"></script>
+    </body>
+    </html>
+    ```
+
+2. **CSS (styles.css)**:
+    ```css
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+    }
+    #dataContainer {
+        margin-top: 20px;
+    }
+    ```
+
+3. **JavaScript (script.js)**:
+    ```javascript
+    document.getElementById('fetchDataBtn').addEventListener('click', function() {
+        fetch('data.json')
+            .then(response => response.json())
+            .then(data => {
+                const dataContainer = document.getElementById('dataContainer');
+                dataContainer.innerHTML = '';
+                data.forEach(item => {
+                    const div = document.createElement('div');
+                    div.textContent = item.name + ': ' + item.value;
+                    dataContainer.appendChild(div);
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    });
+    ```
+
+4. **JSON Data (data.json)**:
+    ```json
+    [
+        {"name": "Item 1", "value": "Value 1"},
+        {"name": "Item 2", "value": "Value 2"},
+        {"name": "Item 3", "value": "Value 3"}
+    ]
+    ```
+
+### Пояснення:
+- **HTML**: Створюємо базовий структуру веб-сторінки з кнопкою та контейнером для відображення даних.
+- **CSS**: Додаємо простий стиль для відображення контенту.
+- **JavaScript**: Додаємо функціональність для завантаження та відображення даних. Коли користувач натискає кнопку, викликається функція, яка завантажує JSON-даних та відображає їх у контейнері.
+- **JSON Data**: Простий файл з даними, які будуть відображатися на сторінці.
+
+Цей приклад демонструє базовий механізм динамічного відображення даних на веб-сторінці. Ви можете розширити його, додавши більше функціональності та стилізацію.
+============================================================
+

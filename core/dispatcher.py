@@ -1,15 +1,17 @@
 import os
 import re
-from core.ai import (
-    ask_ai, change_ctx_size, change_model, current_ctx_size, current_model, load_ai, load_llm, 
-    load_session, load_status, save_session, set_memory_recording, get_memory_status, unload_ai
+from core.ai.engine import (
+    ask_ai, change_ctx_size, change_model, current_ctx_size, current_model, 
+    load_ai, load_llm, load_session, load_status, save_session, 
+    set_memory_recording, get_memory_status, unload_ai
 )
-from core.cmd import (
+from core.utils.cmd_ui import (
     get_app_version, set_auto_clear, set_auto_update, set_project, get_project, 
     clear, show_ai_help_menu, show_base_help_menu, show_full_help_menu, 
-    show_cosmetic_menu, read_file, restart_program, exit_program, show_menu, show_settings, check_for_updates
+    show_cosmetic_menu, read_file, restart_program, exit_program, show_menu, 
+    show_settings, check_for_updates
 )
-from core.config import (
+from core.utils.config import (
     get_auto_load_status, set_auto_load
 )
 
@@ -117,7 +119,6 @@ def handle_command(command_text):
     if text.startswith("ai load "):
         return load_session(text[len("ai load "):].strip())
 
-    # Прямий запит
     if text.startswith('ai "'):
         clean_prompt = text[3:].strip().strip('"\'')
         return ask_ai(clean_prompt)
@@ -140,5 +141,5 @@ def handle_command(command_text):
         
         return ask_ai(final_prompt)
     if text == "ai project":
-        from core.ai import analyze_project
+        from core.ai.engine import analyze_project
         return analyze_project()

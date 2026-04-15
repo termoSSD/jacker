@@ -2,19 +2,20 @@ import os
 import sys
 import json
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CONFIG_DIR = os.path.join(BASE_DIR, "config")
-SETTINGS_PATH = os.path.join(CONFIG_DIR, "settings.json")
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+CONFIG_DIR = os.path.join(BASE_DIR, "config") 
+SETTINGS_PATH = os.path.join(CONFIG_DIR, "settings.json")
 SETTINGS_FILE = os.path.join(BASE_DIR, "settings.json")
+
 MEMORY_DIR = os.path.join(BASE_DIR, "memory")
 
-VERSION = "0.9.5"
+VERSION = "1.0.1"
 GITHUB_VERSION_URL = "https://raw.githubusercontent.com/termoSSD/below/main/VERSION"
 
 DEFAULT_SETTINGS = {
     "model": "",
-    "project_path": "",
+    "path": "",
     "record_history": False,
     "ctx_size": 4096,
     "clear_before_menu": True,
