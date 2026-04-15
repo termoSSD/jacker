@@ -3,6 +3,8 @@ import sys
 import json
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONFIG_DIR = os.path.join(BASE_DIR, "config")
+SETTINGS_PATH = os.path.join(CONFIG_DIR, "settings.json")
 
 SETTINGS_FILE = os.path.join(BASE_DIR, "settings.json")
 MEMORY_DIR = os.path.join(BASE_DIR, "memory")
@@ -31,16 +33,20 @@ else:
 '''
 FUNCTIONS
 '''
+
 def load_settings():
-    if not os.path.exists(SETTINGS_FILE):
-        save_settings(DEFAULT_SETTINGS)
-        return DEFAULT_SETTINGS
+    if not os.path.exists(CONFIG_DIR):
+        os.makedirs(CONFIG_DIR)
+
+    if not os.path.exists(SETTINGS_PATH):
+        return {}
+
     try:
-        with open(SETTINGS_FILE, "r", encoding="utf-8") as file:
-            return json.load(file)
+        with open(SETTINGS_PATH, "r", encoding="utf-8") as f:
+            return json.load(f)
     except Exception:
-        # If there's an error loading settings, reset to default
-        return DEFAULT_SETTINGS
+        return {}
+
 
 def save_settings(settings_dict):
     with open(SETTINGS_FILE, "w", encoding="utf-8") as file:
@@ -53,7 +59,12 @@ def get_setting(key, default=None):
 def update_setting(key, value):
     settings = load_settings()
     settings[key] = value
-    save_settings(settings)
+
+    if not os.path.exists(CONFIG_DIR):
+        os.makedirs(CONFIG_DIR)
+        
+    with open(SETTINGS_PATH, "w", encoding="utf-8") as f:
+        json.dump(settings, f, indent=4, ensure_ascii=False)
 
 def set_auto_load(state: bool):
     update_setting("auto_load", state)

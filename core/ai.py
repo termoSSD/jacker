@@ -1,5 +1,4 @@
 import json, datetime, gc, os, ctypes, subprocess
-from urllib import response
 from llama_cpp import Llama, llama_log_set, llama_log_callback
 from core.cmd import get_project, print_error, print_info, print_markdown
 from core.config import get_setting, update_setting, MEMORY_DIR
