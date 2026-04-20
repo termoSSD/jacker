@@ -20,7 +20,7 @@ def get_system_prompt():
     path = get_project() or "Not selected"
     
     prompt = (
-        f"Your name is Markus. You are an elite, local AI daemon running directly on the user's machine ({os_info}).\n"
+        f"Your name is Marko. You are an elite, local AI daemon running directly on the user's machine ({os_info}).\n"
         f"[SYSTEM DATA]\n"
         f"- Current Time: {current_time}\n"
         f"- Current Workspace: {path}\n"
@@ -162,6 +162,11 @@ def ask_ai(prompt, silent=False):
 
     _chat_history.append({"role": "user", "content": user_content})
 
+    if not _chat_history or _chat_history[0].get("role") != "system":
+        _chat_history.insert(0, {"role": "system", "content": get_system_prompt()})
+    else:
+        _chat_history[0]["content"] = get_system_prompt()
+
     try: 
         if not silent: logger.info(f"Sending request to AI...")
 
@@ -175,35 +180,14 @@ def ask_ai(prompt, silent=False):
         commands = re.findall(r'\[CMD:\s*(.*?)\s*\|\s*(.*?)\s*\]', full_response)
         
         for action, target in commands:
-            action = action.upper().strip()
-
-            if action == "SEARCH":  
-                search_results = search_web(target)
-                _chat_history.append({"role": "system", "content": f"Search results:\n{search_results}\n\nIf you see a specific URL that likely contains the answer, use [CMD: BROWSE | url]. Otherwise, answer now."})
-                return ask_ai(f"I found some links for '{target}'. Look at them. If one looks perfect, browse it. If you have enough info, just answer the user.", silent=silent)
-
-            elif action == "BROWSE":
-                if not silent:
-                    from core.utils.cmd_ui import print_info
-                    print_info(f"Reading page: {target}...", title="Web Agent")
-                
-                from core.tools.web import fetch_page_content
-                page_text = fetch_page_content(target)
-                
-                _chat_history.append({"role": "system", "content": f"Content of {target}:\n{page_text}"})
-                return ask_ai(
-    f"I just read {target}. If it contains weather data (temp/humidity), tell the user. "
-    "IF THE DATA IS MISSING OR IRRELEVANT, DO NOT APOLOGIZE. "
-    "Instead, look at the previous search results and BROWSE a different URL, or just use the snippets. "
-    "Answer in Ukrainian.", 
-    silent=silent
-)
+            if not silent:
+                print_info(f"Executing: {action} -> {target}", title="System Interface")
+            execute_system_command(action, target)
             
         display_response = re.sub(r'\[CMD:\s*.*?\s*\|\s*.*?\s*\]', '', full_response).strip()
-        
-        if not silent and display_response:
+
+        if not silent:
             print() 
-            from core.utils.cmd_ui import print_markdown
             print_markdown(display_response)
             print() 
         
